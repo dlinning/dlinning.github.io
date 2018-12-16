@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- Icon from FontAwesome. License: https://fontawesome.com/license -->
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Team Generator</title>
+
+    <meta name="theme-color" content="#00838f">
+    <link rel="icon" sizes="192x192" href="./images/icons/icon-192x192.png">
+
+    <link rel="manifest" href="./manifest.json">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <header>
+        <span>Team Generator</span>
+    </header>
+
+    <div id="content" class="col">
+        <div class="col">
+            <label for="names">Players</label>
+            <textarea name="names" id="names" cols="30" rows="10" placeholder="Names, one per line"></textarea>
+        </div>
+        <div class="row btwn">
+            <label id="tCLabel" for="teamCount">Teams</label>
+            <input type="number" name="teamCount" id="teamCount" min="2" max="99" increment="1" value="2">
+        </div>
+        <br />
+        <div class="row btwn">
+            <label for="randNames">Random Team Names</label>
+            <label class="switch">
+                <input type="checkbox" name="randNames" id="randNames">
+                <span class="slider"></span>
+            </label>
+        </div>
+        <br>
+        <div class="row">
+            <button id="submit" class="center">Generate Teams</button>
+        </div>
+        <div id="results" class="col">
+
+        </div>
+    </div>
+
+</body>
+<script>
+    var teamCountIfTrue = true;
+    (function () {
+        document.getElementById('submit').addEventListener('click', function (e) {
+            e.preventDefault();
+
+            var names = document.getElementById('names').value.split('\n');
+            var teamCount = parseInt(document.getElementById('teamCount').value);
+            var randNames = document.getElementById('randNames').checked;
+
+            var teams = [];
+            for (var n = 0; n < teamCount; n++) {
+                teams.push({
+                    name: randNames ? RandomTeamName() : 'Team ' + (n + 1),
+                    players: []
+                });
+            }
+            names = shuffle(names);
+            var t = 0;
+            for (var i = 0; i < names.length; i++) {
+                if (names[i].trim().length > 0) {
+                    teams[t].players.push(names[i]);
+
+                    t++;
+                    if (t >= teams.length) {
+                        t = 0;
+                    }
+                }
+            }
+            displayTeams(teams);
+        });
+    })();
+    function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[a[i], a[j]] = [a[j], a[i]] }; return a }
+    function displayTeams(teams) {
+        var res = document.getElementById('results');
+        while (res.firstChild) {
+            res.removeChild(res.firstChild);
+        }
+        for (let i = 0; i < teams.length; i++) {
+            var t = document.createElement('div');
+            t.classList.add('team');
+            t.innerHTML += '<span class="teamname">' + teams[i].name + '</span>'
+            for (let n = 0; n < teams[i].players.length; n++) {
+                t.innerHTML += '<span>' + (n + 1) + '. ' + teams[i].players[n] + '</span>';
+            }
+            res.appendChild(t);
+        }
+    }
+    function RandomTeamName() {
+        var adjs = ["able", "bad", "best", "better", "big", "certain", "clear", "different", "early", "easy", "economic", "evil", "federal", "free", "full", "good", "great", "hard", "high", "human", "important", "large", "late", "little", "local", "long", "low", "major", "military", "national", "new", "old", "only", "other", "political", "possible", "public", "real", "recent", "right", "small", "social", "special", "strong", "sure", "true", "whole", "young"];
+        var nouns = ["puppies", "bears", "trumpets", "wangdoodles", "cupcakes", "cookies", "kids", "gang", "socks", "wildebeests", "underpants", "nerds", "pencils", "tweens", "hobos", "falcons", "desk lamps", "hosers", "millennials", "avocado toasts", "pantaloons", "flapjacks", "superstars", "team", "geeks", "penguins", "gatos", "perros", "muppets", "pretzels", "hot dogs"];
+
+        var res = adjs[Math.floor(Math.random() * adjs.length)] + ' ' + nouns[Math.floor(Math.random() * nouns.length)];
+
+        return res == "big hot dogs" ? "Big, Stinky, Hot Dogs" : res;
+    }
+</script>
+
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function () {
+            navigator.serviceWorker.register('./sw.js').then(function (success) {
+                console.log('sw.js registered', success);
+            }).catch(function (err) {
+                console.log('Service worker failed to register', err);
+            });
+        });
+    }
+</script>
+
+</html>

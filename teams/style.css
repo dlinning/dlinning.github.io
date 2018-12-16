@@ -1,0 +1,164 @@
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+html {
+	font-family: Arial, Helvetica, sans-serif;
+}
+.row {
+	display: flex;
+	align-items: center;
+}
+.row > label {
+	justify-self: flex-start;
+}
+.row > input {
+	justify-self: flex-end;
+}
+.col {
+	display: flex;
+	flex-direction: column;
+}
+.center {
+	margin-left: auto;
+	margin-right: auto;
+}
+.row.center,
+.col.center {
+	justify-content: center;
+}
+.row.btwn {
+	justify-content: space-between;
+}
+header {
+	background-color: #00838f;
+	position: sticky;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 52px;
+	padding: 0 16px;
+}
+header span {
+	line-height: 52px;
+	color: #fff;
+	font-size: 24px;
+}
+body {
+	background: #efefef;
+	color: #222;
+}
+#content {
+	padding: 16px;
+}
+#content > * + * {
+	margin-top: 16px;
+}
+textarea,
+input {
+	padding: 4px 8px;
+	font-size: 18px;
+}
+button {
+	border: none;
+	border-radius: 2px;
+	background-color: #00838f;
+	color: #fff;
+	font-weight: bold;
+	font-size: 14px;
+	text-transform: uppercase;
+	min-width: 80px;
+	text-align: center;
+	height: 32px;
+	padding: 4px 8px;
+	letter-spacing: 0.05em;
+}
+button:focus {
+	background-color: #005662;
+}
+label {
+	font-weight: bold;
+	font-size: 15px;
+	text-transform: uppercase;
+	color: #444;
+	letter-spacing: 0.1em;
+}
+.team {
+	display: flex;
+	flex-direction: column;
+}
+.teamname {
+	font-weight: 700;
+	margin-top: 12px;
+	font-size: 16px;
+	text-transform: capitalize;
+}
+
+/* The switch - the box around the slider */
+.switch {
+	position: relative;
+	display: inline-block;
+	width: 60px;
+	height: 34px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+	display: none;
+}
+
+/* The slider */
+.slider {
+	position: absolute;
+	cursor: pointer;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: #ccc;
+	-webkit-transition: 0.4s;
+	transition: 0.4s;
+}
+
+.slider:before {
+	position: absolute;
+	content: "";
+	height: 26px;
+	width: 26px;
+	left: 4px;
+	bottom: 4px;
+	background-color: white;
+	-webkit-transition: 0.4s;
+	transition: 0.4s;
+}
+
+input:checked + .slider {
+	background-color: #00838f;
+}
+
+input:focus + .slider {
+	box-shadow: 0 0 1px #00838f;
+}
+
+input:checked + .slider:before {
+	transform: translateX(26px);
+}
+
+#results {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+}
+#results .team {
+	width: 50%;
+	display: flex;
+	flex-direction: column;
+}
+
+@media screen and (min-width: 769px) {
+	#content {
+		max-width: 740px;
+		margin: 0 auto;
+	}
+}

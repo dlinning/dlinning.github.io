@@ -1,0 +1,33 @@
+h1{font-size:45px;}
+h2{font-size:34px;margin:12px 0 6px;line-height:1.1}
+h3{font-size:24px;margin:12px 0 6px;line-height:1.1;}
+h4{font-size:20px;margin:6px 0px 3px;line-height:1.1;}
+h5{font-size:16px;margin:2px 0;font-weight:700;line-height:1.1}
+h6{line-height: 1.1;margin:4px 0;}
+body{font-size:14px;line-height:1.2;}
+hr{border-style:dotted;}
+
+p>code{background:rgba(0,0,0,.8);border-radius:2px;padding:2px 4px;}
+
+blockquote{
+	padding:1px 8px;
+}
+
+ul{
+    padding-left:18px;
+}
+ul > li{
+	line-height:1.2;
+}
+
+img{
+	margin:8px auto;
+}
+
+table{margin: 0 auto;border:1px solid #666666}
+tr:nth-of-type(2n){background:rgba(150,150,150,0.1);}
+
+.2up{
+display:flex;flex-direction:row;
+margin:12px auto;
+}
