@@ -1,120 +1,183 @@
 <!DOCTYPE html>
 <html lang="en">
-<!-- Icon from FontAwesome. License: https://fontawesome.com/license -->
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <title>Team Generator</title>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Team Generator</title>
+        <meta name="theme-color" content="#00838f" />
+        <link rel="icon" sizes="192x192" href="./images/icons/icon-192x192.png" />
 
-    <meta name="theme-color" content="#00838f">
-    <link rel="icon" sizes="192x192" href="./images/icons/icon-192x192.png">
+        <link rel="manifest" href="./manifest.json" />
+        <link rel="stylesheet" href="style.css" />
+    </head>
 
-    <link rel="manifest" href="./manifest.json">
-    <link rel="stylesheet" href="style.css">
-</head>
+    <body>
+        <header class="row btwn">
+            <span>Team Generator</span>
+            <div id="dark-toggle"></div>
+        </header>
 
-<body>
-    <header>
-        <span>Team Generator</span>
-    </header>
-
-    <div id="content" class="col">
-        <div class="col">
-            <label for="names">Players</label>
-            <textarea name="names" id="names" cols="30" rows="10" placeholder="Names, one per line"></textarea>
+        <div id="content" class="col">
+            <form action="" id="form" class="col">
+                <div class="col">
+                    <label for="names">Names</label>
+                    <textarea name="names" id="names" cols="30" rows="10" placeholder="Names, one per line"></textarea>
+                </div>
+                <div class="row btwn">
+                    <label id="tCLabel" for="teamCount">Teams</label>
+                    <input type="number" name="teamCount" id="teamCount" min="2" max="99" increment="1" value="2" />
+                </div>
+                <div class="row btwn">
+                    <label for="asOrder">Random Order</label>
+                    <label class="switch">
+                        <input type="checkbox" name="asOrder" id="asOrder" />
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="row">
+                    <button type="submit" class="center">Generate Teams</button>
+                </div>
+            </form>
+            <div id="results"></div>
         </div>
-        <div class="row btwn">
-            <label id="tCLabel" for="teamCount">Teams</label>
-            <input type="number" name="teamCount" id="teamCount" min="2" max="99" increment="1" value="2">
-        </div>
-        <br />
-        <div class="row btwn">
-            <label for="randNames">Random Team Names</label>
-            <label class="switch">
-                <input type="checkbox" name="randNames" id="randNames">
-                <span class="slider"></span>
-            </label>
-        </div>
-        <br>
-        <div class="row">
-            <button id="submit" class="center">Generate Teams</button>
-        </div>
-        <div id="results" class="col">
-
-        </div>
-    </div>
-
-</body>
-<script>
-    var teamCountIfTrue = true;
-    (function () {
-        document.getElementById('submit').addEventListener('click', function (e) {
-            e.preventDefault();
-
-            var names = document.getElementById('names').value.split('\n');
-            var teamCount = parseInt(document.getElementById('teamCount').value);
-            var randNames = document.getElementById('randNames').checked;
-
-            var teams = [];
-            for (var n = 0; n < teamCount; n++) {
-                teams.push({
-                    name: randNames ? RandomTeamName() : 'Team ' + (n + 1),
-                    players: []
-                });
+    </body>
+    <script>
+        const setColorTheme = (el, mode, save) => {
+            if (!el) {
+                return;
             }
-            names = shuffle(names);
-            var t = 0;
-            for (var i = 0; i < names.length; i++) {
-                if (names[i].trim().length > 0) {
-                    teams[t].players.push(names[i]);
+            var keys = ["--bg-color", "--text-color", "--input-bg-color", "--dark-toggle-icon"];
+            var d = ["#212121", "#efefef", "#333", "'🌙'"];
+            var l = ["#efefef", "#212121", "#fff", "'☀'"];
+            let s = mode ? d : l;
+            keys.forEach((k, i) => {
+                el.style.setProperty(k, s[i]);
+            });
+            if (save) {
+                window.localStorage.setItem("dark_teams", mode);
+            }
+        };
+        //
+        function shuffle(a) {
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+        const displayTeams = teams => {
+            const res = clearResults();
 
-                    t++;
-                    if (t >= teams.length) {
-                        t = 0;
-                    }
+            let lastCount = teams[0].players.length;
+            let evenTeams = true;
+            for (let i = 0, l = teams.length; i < l; i++) {
+                if (teams[i].players.length !== lastCount) {
+                    evenTeams = false;
+                    break;
                 }
             }
-            displayTeams(teams);
-        });
-    })();
-    function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[a[i], a[j]] = [a[j], a[i]] }; return a }
-    function displayTeams(teams) {
-        var res = document.getElementById('results');
-        while (res.firstChild) {
-            res.removeChild(res.firstChild);
-        }
-        for (let i = 0; i < teams.length; i++) {
-            var t = document.createElement('div');
-            t.classList.add('team');
-            t.innerHTML += '<span class="teamname">' + teams[i].name + '</span>'
-            for (let n = 0; n < teams[i].players.length; n++) {
-                t.innerHTML += '<span>' + (n + 1) + '. ' + teams[i].players[n] + '</span>';
+
+            for (let i = 0, l = teams.length; i < l; i++) {
+                var t = document.createElement("div");
+                t.classList.add("team");
+                t.innerHTML += `<span class="teamname">${teams[i].name} ${
+                    !evenTeams ? `(${teams[i].players.length})` : ""
+                }</span>`;
+                for (let n = 0; n < teams[i].players.length; n++) {
+                    t.innerHTML += `<span class="player">${n + 1}. ${teams[i].players[n]}</span>`;
+                }
+                res.appendChild(t);
+            }
+        };
+        const displayAsOrder = names => {
+            const res = clearResults();
+            res.classList.add('asOrder')
+
+            var t = document.createElement("div");
+            t.classList.add("team");
+            for (let i = 0, l = names.length; i < l; i++) {
+                t.innerHTML += `<span class="${i === 0 ? "teamname" : "player"}">${i + 1}. ${names[i]}</span>`;
             }
             res.appendChild(t);
-        }
-    }
-    function RandomTeamName() {
-        var adjs = ["able", "bad", "best", "better", "big", "certain", "clear", "different", "early", "easy", "economic", "evil", "federal", "free", "full", "good", "great", "hard", "high", "human", "important", "large", "late", "little", "local", "long", "low", "major", "military", "national", "new", "old", "only", "other", "political", "possible", "public", "real", "recent", "right", "small", "social", "special", "strong", "sure", "true", "whole", "young"];
-        var nouns = ["puppies", "bears", "trumpets", "wangdoodles", "cupcakes", "cookies", "kids", "gang", "socks", "wildebeests", "underpants", "nerds", "pencils", "tweens", "hobos", "falcons", "desk lamps", "hosers", "millennials", "avocado toasts", "pantaloons", "flapjacks", "superstars", "team", "geeks", "penguins", "gatos", "perros", "muppets", "pretzels", "hot dogs"];
+        };
+        const clearResults = () => {
+            var res = document.getElementById("results");
+            while (res.firstChild) {
+                res.removeChild(res.firstChild);
+            }
+            res.classList.remove('asOrder');
+            return res;
+        };
+        (() => {
+            // Set the background color based on user preference
+            var savedPref = window.localStorage.getItem("dark_teams");
 
-        var res = adjs[Math.floor(Math.random() * adjs.length)] + ' ' + nouns[Math.floor(Math.random() * nouns.length)];
+            var userPrefersDark = savedPref === "true";
+            const PrefWasChosen = savedPref !== null;
 
-        return res == "big hot dogs" ? "Big, Stinky, Hot Dogs" : res;
-    }
-</script>
+            var rootElement = document.querySelector(":root");
+            if (PrefWasChosen) {
+                setColorTheme(rootElement, userPrefersDark, false);
+            } else {
+                // No preference, use system theme
+                setColorTheme(rootElement, window.matchMedia("(prefers-color-scheme: dark)").matches, false);
+            }
 
-<script>
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function () {
-            navigator.serviceWorker.register('./sw.js').then(function (success) {
-                console.log('sw.js registered', success);
-            }).catch(function (err) {
-                console.log('Service worker failed to register', err);
+            document.getElementById("dark-toggle").addEventListener("click", function(e) {
+                userPrefersDark = !(window.localStorage.getItem("dark_teams") === "true");
+                setColorTheme(rootElement, userPrefersDark, true);
             });
-        });
-    }
-</script>
+            //
 
+            // Attach the input listener for team generation
+            document.getElementById("form").addEventListener("submit", function(e) {
+                e.preventDefault();
+
+                var names = document.getElementById("names").value.split("\n");
+                var teamCount = parseInt(document.getElementById("teamCount").value);
+
+                var asPlayerOrder = document.getElementById("asOrder").checked;
+
+                names = shuffle(names);
+
+                if (!asPlayerOrder) {
+                    var teams = [];
+                    for (var n = 0; n < teamCount; n++) {
+                        teams.push({
+                            name: "Team " + (n + 1),
+                            players: []
+                        });
+                    }
+
+                    var t = 0;
+                    for (var i = 0; i < names.length; i++) {
+                        if (names[i].trim().length > 0) {
+                            teams[t].players.push(names[i]);
+
+                            t++;
+                            if (t >= teams.length) {
+                                t = 0;
+                            }
+                        }
+                    }
+                    displayTeams(teams);
+                } else {
+                    // Only display a player order
+                    displayAsOrder(names);
+                }
+            });
+        })();
+    </script>
+
+    <script>
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", function() {
+                navigator.serviceWorker
+                    .register("./sw.js")
+                    .catch(e => console.log("Service worker failed to register", e));
+            });
+        }
+    </script>
 </html>
