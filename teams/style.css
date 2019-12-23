@@ -33,7 +33,9 @@ body {
     color: var(--text-color);
     transition: background-color 200ms ease, color 200ms ease;
 }
-
+.dnone{
+    display: none;
+}
 .row {
     display: flex;
     align-items: center;
@@ -98,6 +100,7 @@ header span {
 }
 #content {
     padding: 16px;
+    position: relative;
 }
 textarea,
 input {
@@ -137,6 +140,11 @@ label {
     text-transform: uppercase;
     color: var(--text-color);
     letter-spacing: 0.1em;
+}
+
+#clear-name-btn{
+    position: absolute;
+    right: 0;
 }
 
 #results {
