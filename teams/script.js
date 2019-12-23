@@ -140,16 +140,21 @@ window.onload = () => {
             }
             this._clearTarget();
 
-            // Shuffle players
-            this._shuffle();
+            if (this.names.length > 0) {
 
-            // Generate and display.
-            if (this.asRandomOrder) {
-                this.hasEvenTeams = true; // Not really, but :shrug:
-                this._renderAsOrder();
+                // Shuffle players
+                this._shuffle();
+
+                // Generate and display.
+                if (this.asRandomOrder) {
+                    this.hasEvenTeams = true; // Not really, but :shrug:
+                    this._renderAsOrder();
+                } else {
+                    this.hasEvenTeams = this.names.length % this.teamCount === 0;
+                    this._renderAsTeams();
+                }
             } else {
-                this.hasEvenTeams = this.names.length % this.teamCount === 0;
-                this._renderAsTeams();
+                alert('Please enter at least one (1) name first.')
             }
         }
         _clearTarget() {
@@ -164,6 +169,7 @@ window.onload = () => {
                 [this.names[i], this.names[j]] = [this.names[j], this.names[i]];
             }
         }
+        //
         _renderAsTeams() {
             // Split into teams, first
             const teams = new Array(this.teamCount);
@@ -189,6 +195,7 @@ window.onload = () => {
             this.target.classList.add('asOrder');
             this.target.appendChild(this._buildTeamCard(`1. ${this.names[0]}`, this.names, 1));
         }
+        //
         _buildTeamCard(teamName, players, playerIdxOffset = 0) {
             var res = document.createElement('div');
             res.classList.add("team");
