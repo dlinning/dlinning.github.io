@@ -142,12 +142,12 @@ label {
     letter-spacing: 0.1em;
 }
 
-#clear-name-btn{
+#clear-names-btn{
     position: absolute;
     right: 0;
     display: none;
 }
-#clear-name-btn.show{
+#clear-names-btn.show{
     display: block;
 }
 

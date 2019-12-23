@@ -12,6 +12,8 @@
 
     <link rel="manifest" href="./manifest.json" />
     <link rel="stylesheet" href="style.css" />
+
+    <script src="script.js"></script>
 </head>
 
 <body>
@@ -24,10 +26,10 @@
         <form action="" id="form" class="col">
             <div class="col">
                 <div class="row btwn">
-                    <label for="names">Names</label>
-                    <button id="clear-name-btn" type="button">Clear</button>
+                    <label for="names-input">Names</label>
+                    <button id="clear-names-btn" type="button">Clear</button>
                 </div>
-                <textarea name="names" id="names" cols="30" rows="10" placeholder="Names, one per line"></textarea>
+                <textarea name="names-input" id="names-input" cols="30" rows="10" placeholder="Names, one per line"></textarea>
             </div>
             <div class="row btwn">
                 <label id="tCLabel" for="teamCount">Teams</label>
@@ -47,182 +49,6 @@
         <div id="results"></div>
     </div>
 </body>
-<script>
-    const setColorTheme = (el, mode, save) => {
-        if (!el) {
-            return;
-        }
-        var keys = ["--bg-color", "--text-color", "--input-bg-color", "--dark-toggle-icon"];
-        var d = ["#212121", "#efefef", "#333", "'🌙'"];
-        var l = ["#efefef", "#212121", "#fff", "'☀'"];
-        let s = mode ? d : l;
-        keys.forEach((k, i) => {
-            el.style.setProperty(k, s[i]);
-        });
-        if (save) {
-            window.localStorage.setItem("dark_teams", mode);
-        }
-    };
-    //
-    function shuffle(a) {
-        for (let i = a.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [a[i], a[j]] = [a[j], a[i]];
-        }
-        return a;
-    }
-    const displayTeams = teams => {
-        const res = clearResults();
-
-        let lastCount = teams[0].players.length;
-        let evenTeams = true;
-        for (let i = 0, l = teams.length; i < l; i++) {
-            if (teams[i].players.length !== lastCount) {
-                evenTeams = false;
-                break;
-            }
-        }
-
-        for (let i = 0, l = teams.length; i < l; i++) {
-            var t = document.createElement("div");
-            t.classList.add("team");
-            t.innerHTML += `<span class="teamname">${teams[i].name} ${
-                !evenTeams ? `(${teams[i].players.length})` : ""
-                }</span>`;
-            for (let n = 0; n < teams[i].players.length; n++) {
-                t.innerHTML += `<span class="player">${n + 1}. ${teams[i].players[n]}</span>`;
-            }
-            res.appendChild(t);
-        }
-    };
-    const displayAsOrder = names => {
-        const res = clearResults();
-        res.classList.add('asOrder')
-
-        var t = document.createElement("div");
-        t.classList.add("team");
-        for (let i = 0, l = names.length; i < l; i++) {
-            t.innerHTML += `<span class="${i === 0 ? "teamname" : "player"}">${i + 1}. ${names[i]}</span>`;
-        }
-        res.appendChild(t);
-    };
-    const clearResults = () => {
-        var res = document.getElementById("results");
-        while (res.firstChild) {
-            res.removeChild(res.firstChild);
-        }
-        res.classList.remove('asOrder');
-        return res;
-    };
-    (() => {
-        // Set the background color based on user preference
-        var savedPref = window.localStorage.getItem("dark_teams");
-
-        var userPrefersDark = savedPref === "true";
-        const PrefWasChosen = savedPref !== null;
-
-        var rootElement = document.querySelector(":root");
-        if (PrefWasChosen) {
-            setColorTheme(rootElement, userPrefersDark, false);
-        } else {
-            // No preference, use system theme
-            setColorTheme(rootElement, window.matchMedia("(prefers-color-scheme: dark)").matches, false);
-        }
-
-        document.getElementById("dark-toggle").addEventListener("click", function (e) {
-            userPrefersDark = !(window.localStorage.getItem("dark_teams") === "true");
-            setColorTheme(rootElement, userPrefersDark, true);
-        });
-        //
-
-        const NAMES_LS_KEY = 'saved-names';
-        function storeNames(toStore) {
-            if (toStore != null) {
-                if (Array.isArray(toStore)) {
-                    toStore = toStore.filter(n => n.trim().length > 0).join('|~|');
-                }
-                window.localStorage.setItem(NAMES_LS_KEY, toStore)
-            } else {
-                window.localStorage.removeItem(NAMES_LS_KEY);
-            }
-        }
-        function loadNamesFromStorage() {
-            const saved = window.localStorage.getItem(NAMES_LS_KEY);
-            if (saved !== null) {
-                return saved.split('|~|').join('\n');
-            } else {
-                return null;
-            }
-        }
-
-        // Attach the input listener for team generation
-        const NAMES_INPUT = document.getElementById("names");
-        const CLEAR_BUTTON = document.getElementById('clear-name-btn');
-
-        const initialNames = loadNamesFromStorage();
-        if (initialNames !== null) {
-            NAMES_INPUT.value = initialNames;
-            CLEAR_BUTTON.classList.add('show');
-        }
-
-        const pullNamesAsArray = () => {
-            return NAMES_INPUT.value.split('\n');
-        }
-
-        NAMES_INPUT.addEventListener('input', function (e) {
-            if (NAMES_INPUT.value.length > 0) {
-                CLEAR_BUTTON.classList.add('show');
-            } else {
-                CLEAR_BUTTON.classList.remove('show');
-            }
-        });
-
-        function GenerateTeams(e) {
-            e.preventDefault();
-
-            var names = pullNamesAsArray();
-            storeNames(names);
-
-            var teamCount = parseInt(document.getElementById("teamCount").value);
-            var asPlayerOrder = document.getElementById("asOrder").checked;
-            names = shuffle(names);
-
-            if (!asPlayerOrder) {
-                var teams = [];
-                for (var n = 0; n < teamCount; n++) {
-                    teams.push({
-                        name: "Team " + (n + 1),
-                        players: []
-                    });
-                }
-
-                var t = 0;
-                for (var i = 0; i < names.length; i++) {
-                    if (names[i].trim().length > 0) {
-                        teams[t].players.push(names[i]);
-
-                        t++;
-                        if (t >= teams.length) {
-                            t = 0;
-                        }
-                    }
-                }
-                displayTeams(teams);
-            } else {
-                // Only display a player order
-                displayAsOrder(names);
-            }
-        }
-        document.getElementById("form").addEventListener("submit", GenerateTeams);
-
-        CLEAR_BUTTON.addEventListener('click', function (e) {
-            e.preventDefault();
-            NAMES_INPUT.value = "";
-            storeNames(null);
-            CLEAR_BUTTON.classList.remove('show');
-        })
-    })();
-</script>
 
 <script>
     if ("serviceWorker" in navigator) {
